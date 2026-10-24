@@ -8,7 +8,7 @@ const fmt = (n) => (n == null ? '–' : String(Math.round(n * 100) / 100).replac
 const estadoDe = (p) => (p == null ? '' : p < 50 ? 'flojo' : p < 75 ? 'mejorable' : 'bien');
 const ETIQUETA = { flojo: 'Reforzar', mejorable: 'Mejorable', bien: 'Bien' };
 const chip = (p) => (p == null ? '' : `<span class="chip ${estadoDe(p)}">${ETIQUETA[estadoDe(p)]}</span>`);
-const barra = (p, clase) => `<div class="barra ${estadoDe(p)}" title="${fmt(p)}%"><i style="width:${Math.min(100, Math.max(0, p || 0))}%"></i>${clase != null ? `<b style="left:${Math.min(100, clase)}%" title="Media de la clase: ${fmt(clase)}%"></b>` : ''}</div>`;
+const barra = (p, clase) => `<div class="barra ${estadoDe(p)}" title="${fmt(nota10(p))} / 10"><i style="width:${Math.min(100, Math.max(0, p || 0))}%"></i>${clase != null ? `<b style="left:${Math.min(100, clase)}%" title="Media de la clase: ${fmt(nota10(clase))} / 10"></b>` : ''}</div>`;
 const calor = (p) => (p == null ? '' : `background:hsl(${Math.round(p * 1.2)} 70% 50% / .38)`);
 const enlazar = (t) => esc(t).replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
 
@@ -524,9 +524,9 @@ async function pestanaAnalisis(ex, cont, comun) {
       <div><strong>${c.aprobados}/${c.presentados}</strong>aprobados</div>
     </div>
     <div class="tarjeta"><h2>Por criterio</h2><table><tbody>
-      ${c.criterios.map((k) => `<tr><td><strong>${esc(k.codigo)}</strong><div class="suave pequeno">${esc(k.descripcion)}</div></td><td style="width:40%">${barra(k.pct)}</td><td class="num">${fmt(k.pct)}%</td><td>${chip(k.pct)}</td></tr>`).join('')}</tbody></table></div>
-    <div class="tarjeta"><h2>Qué ejercicios se han atascado más</h2><table><thead><tr><th>Ej.</th><th>Qué pide</th><th>Criterio</th><th></th><th class="num">%</th><th class="num">Con 0 pts.</th></tr></thead><tbody>
-      ${[...c.items].sort((a, b) => (a.pct ?? 101) - (b.pct ?? 101)).map((i) => `<tr><td><strong>${i.ref}</strong></td><td>${esc(i.titulo)}${detalleItem(porId.get(i.id))}</td><td>${esc(i.criterio)}</td><td style="width:20%">${barra(i.pct)}</td><td class="num">${fmt(i.pct)}</td><td class="num">${i.ceros}/${i.n}</td></tr>`).join('')}</tbody></table></div>
+      ${c.criterios.map((k) => `<tr><td><strong>${esc(k.codigo)}</strong><div class="suave pequeno">${esc(k.descripcion)}</div></td><td style="width:40%">${barra(k.pct)}</td><td class="num">${fmt(nota10(k.exacto))}</td><td>${chip(k.pct)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="tarjeta"><h2>Qué ejercicios se han atascado más</h2><table><thead><tr><th>Ej.</th><th>Qué pide</th><th>Criterio</th><th></th><th class="num">Nota (0-10)</th><th class="num">Con 0 pts.</th></tr></thead><tbody>
+      ${[...c.items].sort((a, b) => (a.pct ?? 101) - (b.pct ?? 101)).map((i) => `<tr><td><strong>${i.ref}</strong></td><td>${esc(i.titulo)}${detalleItem(porId.get(i.id))}</td><td>${esc(i.criterio)}</td><td style="width:20%">${barra(i.pct)}</td><td class="num">${fmt(nota10(i.exacto))}</td><td class="num">${i.ceros}/${i.n}</td></tr>`).join('')}</tbody></table></div>
     <div class="tarjeta tabla-scroll"><h2>Mapa de la clase</h2><table class="mapa"><thead><tr><th>Nº</th><th>Alumno</th>
       ${ex.items.map((i) => `<th class="num">${refDe(i)}</th>`).join('')}<th class="num">Nota</th></tr></thead><tbody>
       ${an.alumnos.map((a) => `<tr><td>${a.num}</td><td style="text-align:left">${esc(a.iniciales)}</td>${a.porItem.map((i) => `<td class="${i.puntos == null ? 'sin' : ''}" style="${calor(i.pct)}">${i.puntos == null ? '–' : fmt(i.puntos)}</td>`).join('')}<td><strong>${fmt(a.nota)}</strong></td></tr>`).join('')}</tbody></table>
