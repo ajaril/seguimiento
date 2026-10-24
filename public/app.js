@@ -661,7 +661,7 @@ async function vistaInformes(examenId, alumnoId, soloActividades) {
   // ?pdf=1: lo abre el servidor para generar el PDF individual (con su hoja de práctica y sin soluciones).
   if (location.hash.includes('pdf=1')) { opciones.hoja = true; opciones.soluciones = false; }
   const unico = alumnoId && an.alumnos.find((a) => a.id === alumnoId);
-  document.title = soloActividades ? `${ex.nombre} - actividades` : unico ? `${ex.nombre} - ${unico.iniciales}` : `${ex.nombre} - informes`;
+  document.title = soloActividades ? `${ex.nombre} - actividades` : unico ? `Informe ${ex.nombre} - ${unico.iniciales}` : `${ex.nombre} - informes`;
   const lista = alumnoId ? an.alumnos.filter((a) => a.id === alumnoId) : an.alumnos.filter((a) => a.nota != null);
   const pintar = () => {
     vista.innerHTML = `<div class="barra-informe noprint">

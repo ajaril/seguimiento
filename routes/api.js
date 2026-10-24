@@ -223,7 +223,7 @@ router.get('/examenes/:id/informes/:alumno/pdf', cargar('examenes'), a(async (re
   const base = `http://127.0.0.1:${process.env.PORT || 3040}`;
   let pdf = null;
   try { await imprimir([`/#/e/${req.fila.id}/informe/${x.id}?pdf=1`], req.cookies.seg_sid, base, (i, buf) => { pdf = buf; }, () => false); } catch (e) { console.error('informe pdf:', e.message); throw fallo(500, e.message); }
-  const nombre = `${limpio(req.fila.nombre)} - ${limpio(x.iniciales)}.pdf`;
+  const nombre = `Informe ${limpio(req.fila.nombre)} - ${limpio(x.iniciales)}.pdf`;
   res.set({ 'Content-Type': 'application/pdf', 'X-Nombre-Archivo': encodeURIComponent(nombre), 'Access-Control-Expose-Headers': 'X-Nombre-Archivo' });
   res.send(pdf);
 }));
@@ -235,7 +235,7 @@ router.get('/examenes/:id/informes.zip', cargar('examenes'), a(async (req, res) 
   if (!alumnos.length) throw fallo(400, 'No hay alumnos con notas.');
   const usados = new Set();
   const nombres = alumnos.map((x) => {
-    let n = `${limpio(req.fila.nombre)} - ${limpio(x.iniciales)}`;
+    let n = `Informe ${limpio(req.fila.nombre)} - ${limpio(x.iniciales)}`;
     if (usados.has(n)) n += ` (${x.num})`;
     usados.add(n);
     return n + '.pdf';
