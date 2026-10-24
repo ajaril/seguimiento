@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { parsearExamen } = require('../lib/tex');
-const { leerLista, leerIdoceo, claveIniciales } = require('../lib/excel');
+const { leerLista, leerCarpetas, leerIdoceo, claveIniciales } = require('../lib/excel');
 const { analizar, codigosDe } = require('../lib/analisis');
 const { leerRubrica } = require('../lib/rubrica');
 const archiver = require('archiver');
@@ -62,7 +62,7 @@ router.get('/grupos/:id', cargar('grupos'), (req, res) => {
   const g = req.fila;
   res.json({
     ...g,
-    alumnos: req.db.prepare('SELECT id, num, iniciales FROM alumnos WHERE grupo_id = ? ORDER BY num').all(g.id),
+    alumnos: req.db.prepare('SELECT id, num, iniciales, carpeta FROM alumnos WHERE grupo_id = ? ORDER BY num').all(g.id),
     examenes: req.db.prepare('SELECT id, nombre, fecha FROM examenes WHERE grupo_id = ? ORDER BY fecha, id').all(g.id),
   });
 });
@@ -77,6 +77,26 @@ router.post('/grupos/:id/alumnos/importar', cargar('grupos'), archivo, a(async (
                               ON CONFLICT(grupo_id, num) DO UPDATE SET iniciales = excluded.iniciales`);
   req.db.transaction(() => lista.forEach((x) => ins.run(req.fila.id, x.num, cadena(x.iniciales, 80))))();
   res.json({ importados: lista.length });
+}));
+
+// Carpeta personal de cada alumno (p. ej. de Drive): Excel con el nombre en la columna A y el enlace en la B.
+router.post('/grupos/:id/alumnos/carpetas', cargar('grupos'), archivo, a(async (req, res) => {
+  if (!req.file) throw fallo(400, 'Falta el archivo Excel');
+  let filas;
+  try { filas = await leerCarpetas(req.file.buffer); } catch { throw fallo(400, 'No he podido leer ese Excel'); }
+  if (!filas.length) throw fallo(400, 'No encuentro enlaces: espero el nombre del alumno en la columna A y el enlace de su carpeta en la B.');
+  const alumnos = req.db.prepare('SELECT id, iniciales FROM alumnos WHERE grupo_id = ?').all(req.fila.id);
+  const porClave = new Map(alumnos.map((x) => [claveIniciales(x.iniciales), x.id]));
+  const act = req.db.prepare('UPDATE alumnos SET carpeta = ? WHERE id = ?');
+  const sinCasar = [];
+  let asignadas = 0;
+  req.db.transaction(() => {
+    for (const f of filas) {
+      const id = porClave.get(claveIniciales(f.nombre));
+      if (id) { act.run(cadena(f.enlace, 500), id); asignadas++; } else sinCasar.push(f.nombre);
+    }
+  })();
+  res.json({ asignadas, sinCasar });
 }));
 
 router.post('/grupos/:id/alumnos', cargar('grupos'), (req, res) => {

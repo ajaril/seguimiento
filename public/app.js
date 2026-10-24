@@ -187,9 +187,15 @@ async function vistaGrupo(id) {
         <button class="sec" data-a="importar-lista">Cargar lista desde Excel</button>
         <span class="suave pequeno">Columna A: número · columna B: iniciales</span>
       </div>
-      <table id="tabla-alumnos"><thead><tr><th>Nº</th><th>Iniciales</th><th></th></tr></thead><tbody>
+      <div class="fila" style="margin-bottom:.8rem">
+        <input type="file" id="excel-carpetas" accept=".xlsx">
+        <button class="sec" data-a="importar-carpetas">Cargar carpetas personales</button>
+        <span class="suave pequeno">Columna A: nombre del alumno · columna B: enlace a su carpeta</span>
+      </div>
+      <table id="tabla-alumnos"><thead><tr><th>Nº</th><th>Iniciales</th><th>Carpeta</th><th></th></tr></thead><tbody>
         ${g.alumnos.map((a) => `<tr data-id="${a.id}"><td><input data-c="num" type="number" min="1" value="${a.num}" style="width:4.5rem"></td>
           <td><input data-c="iniciales" maxlength="80" value="${esc(a.iniciales)}" style="width:min(24rem, 90%)"></td>
+          <td>${a.carpeta ? `<a href="${esc(a.carpeta)}" target="_blank" rel="noopener noreferrer">Abrir</a>` : '<span class="suave">–</span>'}</td>
           <td><button class="peligro mini" data-a="borrar-alumno" title="Eliminar alumno y sus notas">✕</button></td></tr>`).join('')}
       </tbody></table>
       <form id="nuevo-alumno" class="fila" style="margin-top:.6rem">
@@ -216,6 +222,10 @@ async function vistaGrupo(id) {
       } else if (a === 'importar-lista') {
         const r = await api('POST', `/grupos/${id}/alumnos/importar`, formArchivo($('#excel-lista')));
         aviso(`${r.importados} alumnos importados`);
+        ruta();
+      } else if (a === 'importar-carpetas') {
+        const r = await api('POST', `/grupos/${id}/alumnos/carpetas`, formArchivo($('#excel-carpetas')));
+        aviso(`${r.asignadas} carpetas asignadas` + (r.sinCasar.length ? `. Sin casar con ningún alumno: ${r.sinCasar.join(', ')}` : ''), !!r.sinCasar.length);
         ruta();
       } else if (a === 'borrar-alumno') {
         const tr = b.closest('tr');
