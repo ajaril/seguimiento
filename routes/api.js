@@ -216,13 +216,14 @@ router.get('/examenes/:id/analisis', cargar('examenes'), (req, res) => {
   res.json({ examen: { id: req.fila.id, nombre: req.fila.nombre, fecha: req.fila.fecha }, ...analizar(d) });
 });
 
-// PDF de un solo alumno (informe + hoja de práctica). El nombre va en X-Nombre-Archivo (codificado) para subirlo a su carpeta.
+// PDF de un solo alumno (informe + hoja de práctica, salvo ?hoja=0). El nombre va en X-Nombre-Archivo (codificado) para subirlo a su carpeta.
 router.get('/examenes/:id/informes/:alumno/pdf', cargar('examenes'), a(async (req, res) => {
   const x = analizar(datosExamen(req.db, req.fila)).alumnos.find((y) => y.id === Number(req.params.alumno));
   if (!x || x.nota == null) throw fallo(404, 'Ese alumno no tiene notas en este examen.');
   const base = `http://127.0.0.1:${process.env.PORT || 3040}`;
+  const sufijo = req.query.hoja === '0' ? '&hoja=0' : '';
   let pdf = null;
-  try { await imprimir([`/#/e/${req.fila.id}/informe/${x.id}?pdf=1`], req.cookies.seg_sid, base, (i, buf) => { pdf = buf; }, () => false); } catch (e) { console.error('informe pdf:', e.message); throw fallo(500, e.message); }
+  try { await imprimir([`/#/e/${req.fila.id}/informe/${x.id}?pdf=1${sufijo}`], req.cookies.seg_sid, base, (i, buf) => { pdf = buf; }, () => false); } catch (e) { console.error('informe pdf:', e.message); throw fallo(500, e.message); }
   const nombre = `Informe ${limpio(req.fila.nombre)} - ${limpio(x.iniciales)}.pdf`;
   res.set({ 'Content-Type': 'application/pdf', 'X-Nombre-Archivo': encodeURIComponent(nombre), 'Access-Control-Expose-Headers': 'X-Nombre-Archivo' });
   res.send(pdf);
@@ -241,7 +242,7 @@ router.get('/examenes/:id/informes.zip', cargar('examenes'), a(async (req, res) 
     return n + '.pdf';
   });
   const base = `http://127.0.0.1:${process.env.PORT || 3040}`;
-  const urls = alumnos.map((x) => `/#/e/${req.fila.id}/informe/${x.id}?pdf=1`);
+  const urls = alumnos.map((x) => `/#/e/${req.fila.id}/informe/${x.id}?pdf=1${req.query.hoja === '0' ? '&hoja=0' : ''}`);
   let cerrado = false;
   res.on('close', () => { cerrado = true; });
   res.set({ 'Content-Type': 'application/zip', 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(limpio(req.fila.nombre) + ' - informes.zip')}` });

@@ -600,11 +600,13 @@ async function subirPdf(token, carpeta, nombre, blob) {
   return driveFetch(token, 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', { method: 'POST', body: f });
 }
 
+let pdfConHoja = true; // los PDF (ZIP y subida a Drive) llevan la hoja de práctica salvo que se desmarque
+
 // Genera el PDF del alumno en el servidor y lo sube a su carpeta. Devuelve el nombre del archivo.
 async function subirInforme(token, examenId, alumno) {
   const carpeta = idCarpeta(alumno.carpeta);
   if (!carpeta) throw new Error('el enlace de su carpeta no es de Drive');
-  const r = await fetch(`/api/examenes/${examenId}/informes/${alumno.id}/pdf`);
+  const r = await fetch(`/api/examenes/${examenId}/informes/${alumno.id}/pdf${pdfConHoja ? '' : '?hoja=0'}`);
   if (!r.ok) { let m = ''; try { m = (await r.json()).error; } catch { /* sin cuerpo */ } throw new Error(m || `Error ${r.status}`); }
   const nombre = decodeURIComponent(r.headers.get('X-Nombre-Archivo') || `${alumno.iniciales}.pdf`);
   await subirPdf(token, carpeta, nombre, await r.blob());
@@ -639,14 +641,20 @@ async function pestanaInformes(ex, cont, comun) {
       aviso(`${ok} de ${lista.length} informes subidos a Drive.` + (fallos.length ? ` Fallos: ${fallos.join(' · ')}` : ''), !!fallos.length);
     });
   };
+  vista.onchange = (e) => {
+    if (e.target.id !== 'chk-pdf-hoja') return;
+    pdfConHoja = e.target.checked;
+    $('#enlace-zip').href = `/api/examenes/${ex.id}/informes.zip${pdfConHoja ? '' : '?hoja=0'}`;
+  };
   cont.innerHTML = `
     <div class="tarjeta">
       <p>Cada informe incluye la nota, los puntos fuertes y flojos por criterio, el detalle ejercicio a ejercicio y qué repasar. Se imprime (o se guarda en PDF) desde el navegador.</p>
       <a class="boton" href="#/e/${ex.id}/todos">Ver / imprimir los de toda la clase</a>
       <a class="boton" href="#/e/${ex.id}/actividades">Descargar solo las actividades (PDF para imprimir)</a>
-      <a class="boton" href="/api/examenes/${ex.id}/informes.zip" download>Descargar ZIP con los informes en PDF</a>
+      <a class="boton" id="enlace-zip" href="/api/examenes/${ex.id}/informes.zip${pdfConHoja ? '' : '?hoja=0'}" download>Descargar ZIP con los informes en PDF</a>
       <a class="boton sec" href="#/e/${ex.id}/profesor">Hoja del profesor (con soluciones)</a>
-      <button data-subir="todos" ${conCarpeta.length ? '' : 'disabled'} title="${conCarpeta.length ? '' : 'Asigna primero las carpetas en la ficha del grupo'}">Subir todos a sus carpetas de Drive (${conCarpeta.length})</button>
+      <label style="display:block;margin-top:.6rem"><input type="checkbox" id="chk-pdf-hoja" ${pdfConHoja ? 'checked' : ''}> Incluir la hoja de práctica al final de cada PDF (ZIP y subida a Drive)</label>
+      <button data-subir="todos" style="margin-top:.4rem" ${conCarpeta.length ? '' : 'disabled'} title="${conCarpeta.length ? '' : 'Asigna primero las carpetas en la ficha del grupo'}">Subir todos a sus carpetas de Drive (${conCarpeta.length})</button>
     </div>
     <div class="tarjeta"><table><thead><tr><th>Nº</th><th>Alumno</th><th class="num">Nota</th><th>Resumen</th><th></th><th></th></tr></thead><tbody>
       ${an.alumnos.map((a) => `<tr><td>${a.num}</td><td>${esc(a.iniciales)}</td><td class="num"><strong>${fmt(a.nota)}</strong></td>
@@ -658,8 +666,8 @@ async function pestanaInformes(ex, cont, comun) {
 async function vistaInformes(examenId, alumnoId, soloActividades) {
   const [ex, an] = await Promise.all([api('GET', `/examenes/${examenId}`), api('GET', `/examenes/${examenId}/analisis`)]);
   migas([ex.grupo.nombre, `#/g/${ex.grupo.id}`], [ex.nombre, `#/e/${examenId}/informes`], [soloActividades ? 'Actividades para imprimir' : alumnoId ? 'Informe' : 'Todos los informes']);
-  // ?pdf=1: lo abre el servidor para generar el PDF individual (con su hoja de práctica y sin soluciones).
-  if (location.hash.includes('pdf=1')) { opciones.hoja = true; opciones.soluciones = false; }
+  // ?pdf=1: lo abre el servidor para generar el PDF individual (sin soluciones; con su hoja de práctica salvo que lleve &hoja=0).
+  if (location.hash.includes('pdf=1')) { opciones.hoja = !location.hash.includes('hoja=0'); opciones.soluciones = false; }
   const unico = alumnoId && an.alumnos.find((a) => a.id === alumnoId);
   document.title = soloActividades ? `${ex.nombre} - actividades` : unico ? `Informe ${ex.nombre} - ${unico.iniciales}` : `${ex.nombre} - informes`;
   const lista = alumnoId ? an.alumnos.filter((a) => a.id === alumnoId) : an.alumnos.filter((a) => a.nota != null);
@@ -745,7 +753,7 @@ function hojaPractica(ex, a, flojos, itemPorId) {
   const caras = flojos.length > 4 ? [flojos.slice(0, Math.ceil(flojos.length / 2)), flojos.slice(Math.ceil(flojos.length / 2))] : [flojos];
   return caras.map((c, i) => `<div class="pagina hoja"><div class="fit-in">
     ${cabeceraAlumno(ex, a, caras.length > 1 ? `Hoja de práctica (${i + 1}/2)` : 'Hoja de práctica')}
-    ${i === 0 ? '<p class="intro">Haz estos ejercicios en esta hoja, deja escritas las operaciones y devuélvesela a tu profesor.</p>' : ''}
+    ${i === 0 ? '<p class="intro">Haz estos ejercicios en esta hoja y deja escritas las operaciones.</p>' : ''}
     ${c.map(cuadro).join('')}</div></div>`).join('');
 }
 
