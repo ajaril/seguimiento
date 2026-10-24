@@ -416,7 +416,7 @@ router.get('/grupos/:id/resumen', cargar('grupos'), (req, res) => {
   const criterios = [...acum.keys()].sort().map((codigo) => ({ codigo, descripcion: desc.get(codigo) || '' }));
   const celdas = {};
   for (const [codigo, porAlumno] of acum) {
-    for (const [alId, t] of porAlumno) (celdas[alId] ||= {})[codigo] = Math.round((t.o / t.p) * 1000) / 10;
+    for (const [alId, t] of porAlumno) (celdas[alId] ||= {})[codigo] = Math.round((t.o / t.p) * 1e6) / 1e4;
   }
   res.json({ alumnos, criterios, celdas, examenes: req.db.prepare('SELECT COUNT(*) AS n FROM examenes WHERE grupo_id = ?').get(g.id).n });
 });

@@ -261,9 +261,9 @@ function tablaResumen(r) {
   return `<div class="tabla-scroll"><table class="mapa"><thead><tr><th>Nº</th><th>Alumno</th>${r.criterios.map((c) => `<th class="num" title="${esc(c.descripcion)}">${esc(c.codigo)}</th>`).join('')}</tr></thead><tbody>
     ${r.alumnos.map((a) => `<tr><td>${a.num}</td><td style="text-align:left">${esc(a.iniciales)}</td>${r.criterios.map((c) => {
       const p = (r.celdas[a.id] || {})[c.codigo];
-      return p == null ? '<td class="sin">–</td>' : `<td style="${calor(p)}">${Math.round(p)}</td>`;
+      return p == null ? '<td class="sin">–</td>' : `<td style="${calor(p)}">${fmt(nota10(p))}</td>`;
     }).join('')}</tr>`).join('')}</tbody></table></div>
-    <p class="leyenda">Porcentaje de puntos conseguidos en cada criterio, sumando todos los exámenes del grupo.</p>`;
+    <p class="leyenda">Nota de 0 a 10 en cada criterio (dos decimales, sin redondear al alza), sumando todos los exámenes del grupo.</p>`;
 }
 
 // ── Examen ─────────────────────────────────────────────────────────────────────
