@@ -137,7 +137,7 @@ async function vistaGrupos() {
     <div class="rejilla" style="margin:1rem 0">
       ${grupos.map((g) => `<a class="tarjeta" href="#/g/${g.id}"><strong>${esc(g.nombre)}</strong>
         <div class="suave pequeno">${esc(g.curso)}</div>
-        <div class="pequeno" style="margin-top:.5rem">${g.alumnos} alumnos · ${g.examenes} exámenes</div></a>`).join('')}
+        <div class="pequeno" style="margin-top:.5rem">${g.alumnos} alumnos · ${g.examenes} pruebas y exámenes</div></a>`).join('')}
       ${grupos.length ? '' : '<p class="vacio">Aún no tienes grupos. Crea el primero aquí abajo.</p>'}
     </div>
     <form class="tarjeta fila" id="nuevo-grupo">
@@ -165,13 +165,13 @@ async function vistaGrupo(id) {
     </div>
 
     <section class="tarjeta" style="margin-top:1rem">
-      <h2>Exámenes</h2>
-      ${g.examenes.length ? `<table><tbody>${g.examenes.map((e) => `<tr><td><a href="#/e/${e.id}"><strong>${esc(e.nombre)}</strong></a></td><td class="suave">${esc(e.fecha)}</td></tr>`).join('')}</tbody></table>` : '<p class="vacio">Todavía no has subido ningún examen.</p>'}
+      <h2>Pruebas y Exámenes</h2>
+      ${g.examenes.length ? `<table><tbody>${g.examenes.map((e) => `<tr><td><a href="#/e/${e.id}"><strong>${esc(e.nombre)}</strong></a></td><td class="suave">${esc(e.fecha)}</td></tr>`).join('')}</tbody></table>` : '<p class="vacio">Todavía no has subido ninguna prueba ni examen.</p>'}
       <form id="nuevo-examen" class="fila" style="margin-top:.8rem">
         <label class="campo">Nombre<input name="nombre" maxlength="120" placeholder="U1 Divisibilidad"></label>
         <label class="campo">Fecha<input name="fecha" type="date"></label>
-        <label class="campo">Examen en LaTeX (.tex)<input type="file" name="tex" accept=".tex,text/x-tex,text/plain"></label>
-        <button style="align-self:flex-end">Crear examen</button>
+        <label class="campo">Prueba o examen en LaTeX (.tex)<input type="file" name="tex" accept=".tex,text/x-tex,text/plain"></label>
+        <button style="align-self:flex-end">Crear prueba o examen</button>
       </form>
     </section>
 
@@ -192,7 +192,7 @@ async function vistaGrupo(id) {
         <button class="sec" data-a="importar-carpetas">Cargar carpetas personales</button>
         <span class="suave pequeno">Columna A: nombre del alumno · columna B: enlace a su carpeta</span>
       </div>
-      <table id="tabla-alumnos"><thead><tr><th>Nº</th><th>Iniciales</th><th>Carpeta</th><th></th></tr></thead><tbody>
+      <table id="tabla-alumnos"><thead><tr><th>Nº</th><th>Iniciales o nombre</th><th>Carpeta</th><th></th></tr></thead><tbody>
         ${g.alumnos.map((a) => `<tr data-id="${a.id}"><td><input data-c="num" type="number" min="1" value="${a.num}" style="width:4.5rem"></td>
           <td><input data-c="iniciales" maxlength="80" value="${esc(a.iniciales)}" style="width:min(24rem, 90%)"></td>
           <td>${a.carpeta ? `<a href="${esc(a.carpeta)}" target="_blank" rel="noopener noreferrer">Abrir</a>` : '<span class="suave">–</span>'}</td>
@@ -216,7 +216,7 @@ async function vistaGrupo(id) {
         await api('PUT', `/grupos/${id}`, { nombre, curso: curso ?? g.curso });
         ruta();
       } else if (a === 'borrar-grupo') {
-        if (!confirm(`¿Eliminar «${g.nombre}» con todos sus alumnos, exámenes y notas? No se puede deshacer.`)) return;
+        if (!confirm(`¿Eliminar «${g.nombre}» con todos sus alumnos, pruebas y exámenes y notas? No se puede deshacer.`)) return;
         await api('DELETE', `/grupos/${id}`);
         location.hash = '#/';
       } else if (a === 'importar-lista') {
@@ -275,13 +275,13 @@ function mediaCriterios(r, a) {
 }
 
 function tablaResumen(r) {
-  if (!r.criterios.length) return '<p class="vacio">Aparecerá cuando haya exámenes con criterios y notas.</p>';
+  if (!r.criterios.length) return '<p class="vacio">Aparecerá cuando haya pruebas o exámenes con criterios y notas.</p>';
   return `<div class="tabla-scroll"><table class="mapa"><thead><tr><th>Nº</th><th>Alumno</th>${r.criterios.map((c) => `<th class="num" title="${esc(c.descripcion)}">${esc(c.codigo)}</th>`).join('')}<th class="num" title="Media de los criterios que lleva el alumno">Media</th></tr></thead><tbody>
     ${r.alumnos.map((a) => `<tr><td>${a.num}</td><td style="text-align:left">${esc(a.iniciales)}</td>${r.criterios.map((c) => {
       const p = (r.celdas[a.id] || {})[c.codigo];
       return p == null ? '<td class="sin">–</td>' : `<td style="${calor(p)}">${fmt(nota10(p))}</td>`;
     }).join('')}${mediaCriterios(r, a)}</tr>`).join('')}</tbody></table></div>
-    <p class="leyenda">Nota de 0 a 10 en cada criterio (dos decimales, sin redondear al alza), sumando todos los exámenes del grupo. «Media»: media de los criterios que lleva cada alumno.</p>`;
+    <p class="leyenda">Nota de 0 a 10 en cada criterio (dos decimales, sin redondear al alza), sumando todas las pruebas y exámenes del grupo. «Media»: media de los criterios que lleva cada alumno.</p>`;
 }
 
 // ── Examen ─────────────────────────────────────────────────────────────────────
@@ -387,7 +387,7 @@ function pestanaNotas(ex, cont, comun) {
 function pestanaEstructura(ex, cont, comun) {
   cont.innerHTML = `
     <div class="tarjeta">
-      <h2>Examen en LaTeX</h2>
+      <h2>Prueba o examen en LaTeX</h2>
       <p class="suave pequeno">${ex.tieneTex ? `Subido: ${esc(ex.archivo || '')}. ` : 'Aún no has subido el .tex. '}Se reconocen los ejercicios escritos como <code>\\ejercicio{[CE 2.1] Enunciado…}</code>; cada etiqueta <code>[CE x.y]</code> del título es un apartado (a, b…) con su criterio. Si lo subes de nuevo se actualizan enunciados y criterios sin borrar notas.</p>
       <div class="fila"><input type="file" id="tex" accept=".tex,text/x-tex,text/plain"><button class="sec" data-a="subir-tex">${ex.tieneTex ? 'Reemplazar .tex' : 'Subir .tex'}</button></div>
     </div>
@@ -555,9 +555,90 @@ async function pestanaAnalisis(ex, cont, comun) {
 // ── Informes ───────────────────────────────────────────────────────────────────
 const opciones = { hoja: true, soluciones: false };
 
+// ── Subida de informes a las carpetas de Drive de cada alumno ──────────────────
+// Se pide a Google un permiso temporal (solo en este navegador) y el PDF se sube directamente desde aquí a la carpeta.
+let tokenDrive = null; // { valor, caduca }
+function permisoDrive() {
+  if (tokenDrive && tokenDrive.caduca > Date.now() + 60000) return Promise.resolve(tokenDrive.valor);
+  return new Promise(async (ok, mal) => {
+    if (!(window.google && google.accounts && google.accounts.oauth2)) return mal(new Error('No he podido cargar el acceso de Google.'));
+    const { googleClientId } = await api('GET', '/auth/config');
+    google.accounts.oauth2.initTokenClient({
+      client_id: googleClientId,
+      scope: 'https://www.googleapis.com/auth/drive',
+      callback: (r) => {
+        if (r.error || !r.access_token) return mal(new Error('Google no ha dado permiso para escribir en Drive' + (r.error ? ` (${r.error})` : '') + '.'));
+        tokenDrive = { valor: r.access_token, caduca: Date.now() + (Number(r.expires_in) || 3600) * 1000 };
+        ok(tokenDrive.valor);
+      },
+      error_callback: (e) => mal(new Error('No se ha podido pedir el permiso a Google' + (e && e.type ? ` (${e.type})` : '') + '.')),
+    }).requestAccessToken();
+  });
+}
+
+const idCarpeta = (url) => { const m = String(url).match(/\/folders\/([\w-]+)/) || String(url).match(/[?&]id=([\w-]+)/); return m ? m[1] : null; };
+
+async function driveFetch(token, url, opts) {
+  const r = await fetch(url, { ...opts, headers: { ...(opts && opts.headers), Authorization: `Bearer ${token}` } });
+  if (!r.ok) {
+    let msg = ''; try { msg = (await r.json()).error.message; } catch { /* sin cuerpo */ }
+    throw new Error(r.status === 404 ? 'Drive no encuentra la carpeta (¿tienes acceso con esta cuenta?)' : r.status === 403 ? 'Drive no te deja escribir en esa carpeta' : msg || `Drive ha respondido ${r.status}`);
+  }
+  return r.json();
+}
+
+// Sube el PDF a la carpeta; si ya hay uno con el mismo nombre lo reemplaza (no se duplican al volver a subir).
+async function subirPdf(token, carpeta, nombre, blob) {
+  const q = encodeURIComponent(`name = '${nombre.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}' and '${carpeta}' in parents and trashed = false`);
+  const ya = await driveFetch(token, `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&supportsAllDrives=true&includeItemsFromAllDrives=true`);
+  if (ya.files.length) {
+    return driveFetch(token, `https://www.googleapis.com/upload/drive/v3/files/${ya.files[0].id}?uploadType=media&supportsAllDrives=true`, { method: 'PATCH', headers: { 'Content-Type': 'application/pdf' }, body: blob });
+  }
+  const f = new FormData();
+  f.append('metadata', new Blob([JSON.stringify({ name: nombre, parents: [carpeta], mimeType: 'application/pdf' })], { type: 'application/json' }));
+  f.append('file', blob);
+  return driveFetch(token, 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', { method: 'POST', body: f });
+}
+
+// Genera el PDF del alumno en el servidor y lo sube a su carpeta. Devuelve el nombre del archivo.
+async function subirInforme(token, examenId, alumno) {
+  const carpeta = idCarpeta(alumno.carpeta);
+  if (!carpeta) throw new Error('el enlace de su carpeta no es de Drive');
+  const r = await fetch(`/api/examenes/${examenId}/informes/${alumno.id}/pdf`);
+  if (!r.ok) { let m = ''; try { m = (await r.json()).error; } catch { /* sin cuerpo */ } throw new Error(m || `Error ${r.status}`); }
+  const nombre = decodeURIComponent(r.headers.get('X-Nombre-Archivo') || `${alumno.iniciales}.pdf`);
+  await subirPdf(token, carpeta, nombre, await r.blob());
+  return nombre;
+}
+
 async function pestanaInformes(ex, cont, comun) {
   const an = await api('GET', `/examenes/${ex.id}/analisis`);
-  vista.onclick = (e) => { comun(e); };
+  const carpeta = new Map(ex.alumnos.map((x) => [x.id, x.carpeta]));
+  const conCarpeta = an.alumnos.filter((a) => a.nota != null && idCarpeta(carpeta.get(a.id)));
+  vista.onclick = (e) => {
+    if (comun(e)) return;
+    const b = e.target.closest('button[data-subir]');
+    if (!b) return;
+    const todos = b.dataset.subir === 'todos';
+    const lista = todos ? conCarpeta : conCarpeta.filter((a) => a.id === Number(b.dataset.subir));
+    if (!lista.length) return aviso('Ese alumno no tiene carpeta de Drive asignada.', true);
+    if (todos && !confirm(`¿Subir los informes (con su hoja de práctica) de ${lista.length} alumnos a sus carpetas? Si ya hay un archivo con el mismo nombre, se reemplaza.`)) return;
+    hacer(async () => {
+      const texto = b.textContent;
+      b.disabled = true;
+      const fallos = [];
+      try {
+        const token = await permisoDrive();
+        for (let i = 0; i < lista.length; i++) {
+          b.textContent = todos ? `Subiendo ${i + 1}/${lista.length}…` : 'Subiendo…';
+          try { await subirInforme(token, ex.id, { id: lista[i].id, iniciales: lista[i].iniciales, carpeta: carpeta.get(lista[i].id) }); }
+          catch (er) { fallos.push(`${lista[i].iniciales}: ${er.message}`); }
+        }
+      } finally { b.disabled = false; b.textContent = texto; }
+      const ok = lista.length - fallos.length;
+      aviso(`${ok} de ${lista.length} informes subidos a Drive.` + (fallos.length ? ` Fallos: ${fallos.join(' · ')}` : ''), !!fallos.length);
+    });
+  };
   cont.innerHTML = `
     <div class="tarjeta">
       <p>Cada informe incluye la nota, los puntos fuertes y flojos por criterio, el detalle ejercicio a ejercicio y qué repasar. Se imprime (o se guarda en PDF) desde el navegador.</p>
@@ -565,11 +646,13 @@ async function pestanaInformes(ex, cont, comun) {
       <a class="boton" href="#/e/${ex.id}/actividades">Descargar solo las actividades (PDF para imprimir)</a>
       <a class="boton" href="/api/examenes/${ex.id}/informes.zip" download>Descargar ZIP con los informes en PDF</a>
       <a class="boton sec" href="#/e/${ex.id}/profesor">Hoja del profesor (con soluciones)</a>
+      <button data-subir="todos" ${conCarpeta.length ? '' : 'disabled'} title="${conCarpeta.length ? '' : 'Asigna primero las carpetas en la ficha del grupo'}">Subir todos a sus carpetas de Drive (${conCarpeta.length})</button>
     </div>
-    <div class="tarjeta"><table><thead><tr><th>Nº</th><th>Alumno</th><th class="num">Nota</th><th>Resumen</th><th></th></tr></thead><tbody>
+    <div class="tarjeta"><table><thead><tr><th>Nº</th><th>Alumno</th><th class="num">Nota</th><th>Resumen</th><th></th><th></th></tr></thead><tbody>
       ${an.alumnos.map((a) => `<tr><td>${a.num}</td><td>${esc(a.iniciales)}</td><td class="num"><strong>${fmt(a.nota)}</strong></td>
         <td class="suave pequeno">${a.texto.reforzar.length ? 'Reforzar: ' + esc(a.texto.reforzar.map((r) => r.codigo).join(', ')) : a.nota == null ? 'Sin notas' : 'Sin bloques flojos'}</td>
-        <td><a href="#/e/${ex.id}/informe/${a.id}">Informe</a></td></tr>`).join('')}</tbody></table></div>`;
+        <td><a href="#/e/${ex.id}/informe/${a.id}">Informe</a></td>
+        <td>${a.nota == null ? '' : idCarpeta(carpeta.get(a.id)) ? `<button class="sec mini" data-subir="${a.id}">Subir a su carpeta</button>` : '<span class="suave pequeno">sin carpeta</span>'}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 async function vistaInformes(examenId, alumnoId, soloActividades) {

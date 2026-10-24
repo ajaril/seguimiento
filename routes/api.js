@@ -197,7 +197,7 @@ router.delete('/examenes/:id', cargar('examenes'), (req, res) => {
 function datosExamen(db, ex) {
   const items = db.prepare('SELECT * FROM items WHERE examen_id = ? ORDER BY ejercicio, apartado').all(ex.id);
   const criterios = db.prepare('SELECT codigo, descripcion, repaso FROM criterios WHERE examen_id = ? ORDER BY codigo').all(ex.id);
-  const alumnos = db.prepare('SELECT id, num, iniciales FROM alumnos WHERE grupo_id = ? ORDER BY num').all(ex.grupo_id);
+  const alumnos = db.prepare('SELECT id, num, iniciales, carpeta FROM alumnos WHERE grupo_id = ? ORDER BY num').all(ex.grupo_id);
   const notas = new Map(db.prepare(`SELECT n.item_id, n.alumno_id, n.puntos FROM notas n JOIN items i ON i.id = n.item_id
                                     WHERE i.examen_id = ? AND n.puntos IS NOT NULL`).all(ex.id).map((n) => [`${n.item_id}:${n.alumno_id}`, n.puntos]));
   return { items, criterios, alumnos, notas };
@@ -215,6 +215,18 @@ router.get('/examenes/:id/analisis', cargar('examenes'), (req, res) => {
   const d = datosExamen(req.db, req.fila);
   res.json({ examen: { id: req.fila.id, nombre: req.fila.nombre, fecha: req.fila.fecha }, ...analizar(d) });
 });
+
+// PDF de un solo alumno (informe + hoja de práctica). El nombre va en X-Nombre-Archivo (codificado) para subirlo a su carpeta.
+router.get('/examenes/:id/informes/:alumno/pdf', cargar('examenes'), a(async (req, res) => {
+  const x = analizar(datosExamen(req.db, req.fila)).alumnos.find((y) => y.id === Number(req.params.alumno));
+  if (!x || x.nota == null) throw fallo(404, 'Ese alumno no tiene notas en este examen.');
+  const base = `http://127.0.0.1:${process.env.PORT || 3040}`;
+  let pdf = null;
+  try { await imprimir([`/#/e/${req.fila.id}/informe/${x.id}?pdf=1`], req.cookies.seg_sid, base, (i, buf) => { pdf = buf; }, () => false); } catch (e) { console.error('informe pdf:', e.message); throw fallo(500, e.message); }
+  const nombre = `${limpio(req.fila.nombre)} - ${limpio(x.iniciales)}.pdf`;
+  res.set({ 'Content-Type': 'application/pdf', 'X-Nombre-Archivo': encodeURIComponent(nombre), 'Access-Control-Expose-Headers': 'X-Nombre-Archivo' });
+  res.send(pdf);
+}));
 
 // ZIP con el informe de cada alumno en PDF (sin la hoja de práctica): «<examen> - <alumno>.pdf».
 const limpio = (t) => String(t).replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim();
