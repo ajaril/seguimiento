@@ -256,14 +256,22 @@ async function vistaGrupo(id) {
   };
 }
 
+// Media de las notas de los criterios que lleva el alumno (los que no tienen dato no cuentan).
+function mediaCriterios(r, a) {
+  const ps = r.criterios.map((c) => (r.celdas[a.id] || {})[c.codigo]).filter((p) => p != null);
+  if (!ps.length) return '<td class="sin">–</td>';
+  const m = ps.reduce((x, y) => x + y, 0) / ps.length;
+  return `<td style="${calor(m)}"><strong>${fmt(nota10(m))}</strong></td>`;
+}
+
 function tablaResumen(r) {
   if (!r.criterios.length) return '<p class="vacio">Aparecerá cuando haya exámenes con criterios y notas.</p>';
-  return `<div class="tabla-scroll"><table class="mapa"><thead><tr><th>Nº</th><th>Alumno</th>${r.criterios.map((c) => `<th class="num" title="${esc(c.descripcion)}">${esc(c.codigo)}</th>`).join('')}</tr></thead><tbody>
+  return `<div class="tabla-scroll"><table class="mapa"><thead><tr><th>Nº</th><th>Alumno</th>${r.criterios.map((c) => `<th class="num" title="${esc(c.descripcion)}">${esc(c.codigo)}</th>`).join('')}<th class="num" title="Media de los criterios que lleva el alumno">Media</th></tr></thead><tbody>
     ${r.alumnos.map((a) => `<tr><td>${a.num}</td><td style="text-align:left">${esc(a.iniciales)}</td>${r.criterios.map((c) => {
       const p = (r.celdas[a.id] || {})[c.codigo];
       return p == null ? '<td class="sin">–</td>' : `<td style="${calor(p)}">${fmt(nota10(p))}</td>`;
-    }).join('')}</tr>`).join('')}</tbody></table></div>
-    <p class="leyenda">Nota de 0 a 10 en cada criterio (dos decimales, sin redondear al alza), sumando todos los exámenes del grupo.</p>`;
+    }).join('')}${mediaCriterios(r, a)}</tr>`).join('')}</tbody></table></div>
+    <p class="leyenda">Nota de 0 a 10 en cada criterio (dos decimales, sin redondear al alza), sumando todos los exámenes del grupo. «Media»: media de los criterios que lleva cada alumno.</p>`;
 }
 
 // ── Examen ─────────────────────────────────────────────────────────────────────
