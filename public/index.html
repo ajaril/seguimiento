@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seguimiento de alumnos</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Cpath d='M7 22l6-7 4 4 8-10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['\\[', '\\]']], processEnvironments: true },
+    options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'input'] },
+    startup: { typeset: false }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+<script async defer src="https://accounts.google.com/gsi/client"></script>
+</head>
+<body>
+<header id="cabecera" hidden>
+  <a href="#/" class="marca">Seguimiento</a>
+  <nav id="migas"></nav>
+  <span class="espacio"></span>
+  <a id="enlace-admin" href="#/admin" hidden>Accesos</a>
+  <span id="usuario"></span>
+  <button id="salir" class="sec">Salir</button>
+</header>
+<main id="vista"></main>
+<div id="avisos" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+	%--------------------------------------------------------------------------
+%  PREÁMBULO
+%--------------------------------------------------------------------------
+\documentclass[12pt,a4paper,twoside]{article}
+\usepackage[utf8]{inputenc}       % Si tu editor utiliza la codificación
+                                    % Occidental ISO latin 1
+                                    % Si utiliza Unicode pon utf8
+\usepackage[german]{babel}
+\usepackage{eurosym} % para el euro
+\usepackage{amsmath,amssymb,dsfont,amsthm, amssymb, yhmath, tipa, eqnarray}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage[update=true]{epstopdf}
+\usepackage[a4paper,lmargin=1.5cm,rmargin=1.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[none]{hyphenat}         % Para que no corte ninguna palabra
+%
+\epstopdfsetup{suffix=.eps}         % Sufijo añadido a los ficheros eps
+% al convertirlos a pdf
+
+\sloppy                             % Suaviza ciertas reglas de ruptura;
+% recomendable con hyphenat none
+
+\pagestyle{plain}                   % Estilo de página por defecto;
+% otra opción es empty
+\setlength{\fboxsep}{3mm}           % Fija la separación entre el texto
+% y el marco
+\setlength{\parindent}{0pt}         % Fija el tamaño de la sangría al
+% comienzo de un párrafo
+
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\usepackage{tabularx}
+\usepackage[pdftex]{color}
+\usepackage{enumerate}
+\usepackage{amsmath, amsthm, amssymb, yhmath}
+\usepackage{setspace}
+\usepackage{multicol}
+\usepackage{multirow} 
+\usepackage{eurosym}
+\usepackage{lastpage}
+%\usepackage[usenames]{color}
+\usepackage{fancyhdr} % activamos el paquete
+\pagestyle{fancy} % seleccionamos un estilo
+% Ponemos la línea de encabezado y pie en blanco
+%\makeatletter
+%\def\headrule{{\color{white}\if@fancyplain
+%\let\headrulewidth\plainheadrulewidth\fi
+%\hrule\@height\headrulewidth\@width\headwidth
+%\vskip-\headrulewidth}}
+%\makeatother
+%\makeatletter
+%\def\footrule{{\color{white}\if@fancyplain  %{red}
+%\let\footrulewidth\plainheadrulewidth\fi
+%\hrule\@height\footrulewidth\@width\headwidth
+%\vskip-\footrulewidth}}
+%\makeatother
+%\fancyhead{} % clear all header fields
+%\fancyfoot{} % clear all foot fields
+%\providecommand{\abs}[1]{\lvert#1\rvert}
+
+\fancyfoot[C]{Página \thepage \ de \pageref{LastPage}} 
+%\textheight 25cm
+%\spanishdecimal{.}
+%--------------------------------------------------------------------------
+%  CUERPO
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%  PREÁMBULO
+%--------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}       % Si tu editor utiliza la codificación
+                                    % Occidental ISO latin 1
+                                    % Si utiliza Unicode pon utf8
+\usepackage[german]{babel}
+\usepackage{eurosym} % para el euro
+\usepackage{amsmath,amssymb,dsfont,amsthm, amssymb, yhmath, tipa, eqnarray}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage[update=true]{epstopdf}
+\usepackage[a4paper,lmargin=1.5cm,rmargin=1.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[none]{hyphenat}         % Para que no corte ninguna palabra
+%
+\epstopdfsetup{suffix=.eps}         % Sufijo añadido a los ficheros eps
+% al convertirlos a pdf
+
+\sloppy                             % Suaviza ciertas reglas de ruptura;
+% recomendable con hyphenat none
+
+\pagestyle{plain}                   % Estilo de página por defecto;
+% otra opción es empty
+\setlength{\fboxsep}{3mm}           % Fija la separación entre el texto
+% y el marco
+\setlength{\parindent}{0pt}         % Fija el tamaño de la sangría al
+% comienzo de un párrafo
+
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\usepackage{tabularx}
+\usepackage[pdftex]{color}
+\usepackage{enumerate}
+\usepackage{amsmath, amsthm, amssymb, yhmath}
+\usepackage{setspace}
+\usepackage{multicol}
+\usepackage{multirow} 
+\usepackage{eurosym}
+\usepackage{lastpage}
+%\usepackage[usenames]{color}
+\usepackage{fancyhdr} % activamos el paquete
+\pagestyle{fancy} % seleccionamos un estilo
+% Ponemos la línea de encabezado y pie en blanco
+%\makeatletter
+%\def\headrule{{\color{white}\if@fancyplain
+%\let\headrulewidth\plainheadrulewidth\fi
+%\hrule\@height\headrulewidth\@width\headwidth
+%\vskip-\headrulewidth}}
+%\makeatother
+%\makeatletter
+%\def\footrule{{\color{white}\if@fancyplain  %{red}
+%\let\footrulewidth\plainheadrulewidth\fi
+%\hrule\@height\footrulewidth\@width\headwidth
+%\vskip-\footrulewidth}}
+%\makeatother
+%\fancyhead{} % clear all header fields
+%\fancyfoot{} % clear all foot fields
+%\providecommand{\abs}[1]{\lvert#1\rvert}
+\usepackage{amsmath, amssymb}
+\usepackage{array}
+
+\newcounter{ej}
+\newcommand{\ejercicio}[1]{\stepcounter{ej}\par\medskip\noindent\textbf{\theej.}\ \textbf{#1}\par\smallskip}
+\newcommand{\hueco}[1][2cm]{\rule{#1}{0.4pt}}
+
+\fancyfoot[C]{Página \thepage \ de \pageref{LastPage}} 
+%\textheight 25cm
+%\spanishdecimal{.}
+%--------------------------------------------------------------------------
+%  CUERPO
+%--------------------------------------------------------------------------
+\begin{document}
+\renewcommand*{\headrulewidth}{0pt} % Para la primera página
+\renewcommand*{\footrulewidth}{0.1pt}
+%\renewcommand*{\footruleskip}{3pt}
+
+%\headrulewidth 0.4pt
+%\footrulewidth 0.1 pt
+
+%\onehalfspacing
+
+%\title{FUNCIONES\vskip .5cm \Large{PRUEBA ESCRITA}}
+%\author{Curso 4º E.S.O. Instituto Isbilya}
+%\date{\normalsize {Mayo de 2012}}
+
+
+%\maketitle
+%\doublespacing
+\begin{center}
+
+
+\begin{center}
+\begin{minipage}[c]{3.5cm}
+\vspace{-1cm} % PARA REDUCIR EL MARGEN SUPERIOR DE LA 1ª PÁGINA
+
+ \includegraphics [width=3cm]{logo.png} 
+
+\vspace{-1cm} % PARA REDUCIR EL MARGEN SUPERIOR DE LA 1ª PÁGINA
+\end{minipage}
+\begin{minipage}[c]{13.5cm}
+	\begin{small}
+%\begin{center}
+\begin{tabularx}{13.5cm}{lXr}
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  %\multicolumn{5}{c}{Puntuaciones}\\
+     
+     \multicolumn{3}{c}{\textbf{1º ESO \hspace{3 cm} MATEMÁTICAS}}\\
+     % & & \\
+    \cline{1-3}
+ 
+  \cline{1-3}  \\%[0.1cm]
+UNIDAD 1. DIVISIBILIDAD.PROBLEMAS&  & CURSO 2026-2027\\
+   \cline{1-3}  \\%0.1cm
+ APELLIDOS, NOMBRE: & & 22-10-2026\\
+   \cline{1-3}
+ 
+  %\hline
+  %Criterio 2.4:& & p de 1 p = & & p sobre 10\\[0.2cm]
+  %\hline
+\end{tabularx}
+%\end{center}
+\end{small}
+\end{minipage}
+%\vskip 3pt
+%\begin{center}
+%\begin{tabular*}{17cm}{l@{\extracolsep{\fill}}r}	
+			%\normalsize{\textbf{I.E.S. ALARIFES RUIZ FLORINDO}}&\normalsize{1º E.S.O. MATEMÁTICAS}\\
+%\hline\\
+			%\normalsize{U.D. 4: FRACCIONES}&\textsc{PRUEBA ESCRITA}\\
+%\hline\\
+			%\large{Alumn@}:& \\
+%\hline\\
+%			\end{tabular*}
+%	\end{center}
+\end{center}
+
+\vspace{0.5cm}
+ \begin{tabularx}{17cm}{lXr}
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  %\multicolumn{5}{c}{Puntuaciones}\\
+    
+
+     \multicolumn{3}{c}{}\\
+     % & & \\
+  %  \cline{1-3}
+ 
+ % \cline{1-3}  \\%[0.1cm]
+\begin{tabular}{| c | c | c |}
+\hline
+\multicolumn{3}{ |c| }{CRITERIOS EVALUACIÓN} \\ \hline
+ CE 4.1  & CE 5.1 & CE 5.2  \\ \hline 
+ & &   \\
+ & &  \\
+ \hline
+\end{tabular} &  &
+
+ \begin{tabular}{| c |}
+
+\multicolumn{1}{c}{ \includegraphics [width=6cm]{logo2.jpg} }
+
+
+\end{tabular}
+\end{tabularx}
+
+ \end{center}
+
+{ \clubpenalty=0 \widowpenalty=0 \brokenpenalty=0 \interlinepenalty=10000 \makeatletter\@beginparpenalty=10000 \makeatother \predisplaypenalty=10000 \postdisplaypenalty=10000
+\begin{enumerate}\setlength{\itemsep}{1em}
+    \item \textbf{[CE 4.1 CE 5.1]} Para la fiesta de fin de curso vamos a ser $35$ personas en clase. Se necesitan $3$ yogures para cada una. Los yogures se venden en packs de $4$. ¿Cuántos yogures se necesitan? ¿Cuántos packs hay que comprar como mínimo? ¿Cuántos yogures sobrarán?
+\vspace{8cm}
+
+    \item \textbf{[CE 5.1 CE 5.2]} Hay $126$ libros de novela y $140$ libros de poesía. Se quieren preparar lotes iguales, con los mismos libros de novela y los mismos libros de poesía en cada lote, sin que sobre ninguno y con el mayor número posible de lotes. ¿Cuántos lotes se pueden preparar? ¿Cuántos libros de novela y cuántos libros de poesía hay en cada lote?
+\newpage
+
+    \item \textbf{[CE 4.1 CE 5.2]} Una biblioteca tiene $90$ libros y quiere colocarlos en montones con el mismo número de libros, sin que sobre ninguno. ¿De cuántos libros pueden ser los montones? Escribe todas las posibilidades (cuenta también el montón de uno solo y el de todos juntos).
+\vspace{10cm}
+    
+    \item \textbf{[CE 5.1 CE 5.2]} Iker va a casa de su abuela cada $45$ días y Noa va a la biblioteca cada $12$ días. Hoy han ido los dos. ¿Cuántos días pasarán hasta que vuelvan a ir el mismo día? ¿Cuántas veces habrá ido cada uno hasta entonces, contando ese día?
+\end{enumerate}
+}
+
+\end{document}
+
