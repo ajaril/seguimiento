@@ -802,7 +802,10 @@ function informe(ex, an, a, soloActividades) {
 
   const sel = opciones.hoja || soloActividades ? seleccionHoja(ex, an, a) : [];
   const p2 = sel.length ? hojaPractica(ex, a, sel, itemPorId) : '';
-  return `<section class="informe">${soloActividades ? '' : p1}${p2}</section>`;
+  // Impresión a doble cara: cada alumno ocupa un número par de páginas (si no, se añade una en blanco) para que no se mezclen alumnos en un folio.
+  const paginas = (soloActividades ? 0 : 1) + (p2.match(/class="pagina hoja"/g) || []).length;
+  const relleno = paginas % 2 && !location.hash.includes('pdf=1') ? '<div class="pagina relleno"></div>' : '';
+  return `<section class="informe">${soloActividades ? '' : p1}${p2}${relleno}</section>`;
 }
 
 // Hoja del profesor: los mismos ejercicios que reciben los alumnos, con la solución y quién hace cada uno.

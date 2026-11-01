@@ -131,7 +131,10 @@ details summary { cursor: pointer; color: var(--acento); }
 /* Hojas de práctica: se ven y se miden con el tamaño del papel (A4 con márgenes de 14 mm) */
 .pagina.hoja { width: 182mm; max-width: 100%; box-sizing: border-box; }
 .pagina .sol-p { font-size: .88em; color: var(--bien); font-style: italic; }
+/* Página en blanco de relleno para la doble cara: solo existe al imprimir */
+.pagina.relleno { display: none; }
 @media print {
+  .pagina.relleno { display: block; height: 1px; }
   @page { size: A4; margin: 12mm 14mm; }
   header, #avisos, .noprint, .pestanas { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
