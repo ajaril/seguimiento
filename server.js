@@ -54,7 +54,7 @@ function crearApp() {
 if (require.main === module) {
   db.sembrarAdmin(process.env.ADMIN_EMAIL);
   const port = process.env.PORT || 3040;
-  crearApp().listen(port, '127.0.0.1', () => console.log(`seguimiento escuchando en :${port}`));
+  crearApp().listen(port, process.env.HOST || '127.0.0.1', () => console.log(`seguimiento escuchando en :${port}`));
 }
 
 module.exports = { crearApp };
